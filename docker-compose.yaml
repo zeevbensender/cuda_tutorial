@@ -1,0 +1,25 @@
+services:
+  cuda-sdk:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cuda-sdk:latest
+    # ports:
+      # - "3000:3000"
+    container_name: cuda-sdk-container
+    environment:
+      # - REACT_APP_API_URL=http://backend:8000
+      FTP_PROXY: http://10.93.66.20:3128/
+      HTTPS_PROXY: http://10.93.66.20:3128/
+      HTTP_PROXY: http://10.93.66.20:3128/
+      NO_PROXY: "localhost,127.0.0.1,::1,10.0.0.0,172.16.0.1,172.28.0.1/16,192.168.0.0/16,.svc,.cluster.local,cattle-system.svc,.cloud.lab,172.28.30.126,172.28.11.105"
+
+
+    # restart: unless-stopped
+    # depends_on:
+    #   backend:
+    #     condition: service_healthy
+
+# networks:
+#   default:
+#     name: poc_ai_chat_network
