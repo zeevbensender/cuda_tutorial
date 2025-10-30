@@ -1,20 +1,50 @@
 __global__ void block_reduce(const float *a, float *partial, int n) {
-    extern __shared__ float sdata[]; //Data shared between the threads of the current block
-    unsigned int tid = threadIdx.x; //Current thread index (in this example it's either 0 or 1)
-    unsigned int i = blockIdx.x * blockDim.x * 2 + threadIdx.x; //Calculate the the start index of the block range
+    // Shared memory buffer for this block (allocated dynamically at kernel launch)
+    extern __shared__ float sdata[];
 
+    // Thread index within the block (0 ... blockDim.x-1)
+    unsigned int tid = threadIdx.x;
+
+    // Compute global index 'i' — the position in the full array 'a' this thread starts from.
+    // Each block handles a continuous 2*blockDim.x chunk of the array.
+    // Each thread loads up to two elements from that chunk.
+    unsigned int i = blockIdx.x * blockDim.x * 2 + threadIdx.x;
+
+    // Each thread accumulates its local partial sum into 'sum'
     float sum = 0.0f;
-    if (i < n) sum += a[i]; // Assign the value of the first member in the block range to sum if i is within the buffer range
-    if (i + blockDim.x < n) sum += a[i + blockDim.x]; // Add the value of the last member in the block range to sum
-    sdata[tid] = sum; //Assign sum value to the shared data member that belongs to the current thread
-    __syncthreads(); //Synchronize threads (Wait until other threads of the block finish???)
 
-    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {//??
+    // Load the first element assigned to this thread (if it exists)
+    if (i < n)
+        sum += a[i];
+
+    // Load the second element, one blockDim.x away (if it exists)
+    // → This doubles throughput: each thread reads 2 elements instead of 1.
+    if (i + blockDim.x < n)
+        sum += a[i + blockDim.x];
+
+    // Store the thread’s partial result into shared memory
+    sdata[tid] = sum;
+
+    // Synchronize all threads in the block
+    // Ensures all sdata[] values are written before any thread starts reading them
+    __syncthreads();
+
+    // Parallel reduction in shared memory:
+    // In each iteration, half of the threads become inactive,
+    // and the remaining ones add their “partner”’s value to their own slot.
+    //
+    // Example: with 8 threads
+    //  Step 1: thread0+=thread4, thread1+=thread5, ...
+    //  Step 2: thread0+=thread2, thread1+=thread3, ...
+    //  Step 3: thread0+=thread1  → sdata[0] now holds block sum.
+    for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
         if (tid < s)
-            sdata[tid] += sdata[tid + s];//??
-        __syncthreads(); //Synchronize threads (Wait until other threads of the block finish???)
+            sdata[tid] += sdata[tid + s];  // Each active thread adds its partner’s value
+        __syncthreads();                   // Wait until all updates are complete
     }
 
+    // After the loop, thread 0 holds the total sum for this block
+    // Write it to the global array 'partial' — one float per block
     if (tid == 0)
         partial[blockIdx.x] = sdata[0];
 }
