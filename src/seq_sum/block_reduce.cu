@@ -1,5 +1,5 @@
 __global__ void block_reduce(const float *a, float *partial, int n) {
-    // Shared memory buffer for this block (allocated dynamically at kernel launch)
+    // Shared memory buffer for this thread block (allocated dynamically at kernel launch)
     extern __shared__ float sdata[];
 
     // Thread index within the block (0 ... blockDim.x-1)
