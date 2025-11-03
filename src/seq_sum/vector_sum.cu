@@ -17,7 +17,7 @@ int main() {
     cudaMalloc(&d_a, size);  // Allocate memory for input vector on GPU of size 1M floats
     cudaMemcpy(d_a, h_a, size, cudaMemcpyHostToDevice);  // Copy host data to GPU
 
-    int threads = 256;
+    // int threads = 256;
     int threads = 8;
     int blocks = (N + threads * 2 - 1) / (threads * 2);  
     // Number of blocks needed so each thread processes ~2 elements.
