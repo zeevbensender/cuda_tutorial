@@ -41,11 +41,11 @@ __global__ void block_reduce(const float *a, float *partial, int n) {
     //  Step 3: thread0+=thread1  → sdata[0] now holds block sum.
     for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
         if (tid < s) {
-            printf("\n\nThread ID: %u; Block index: %u; Block dimension: %u; \nif (tid < s): if (%u < %u);\nsdata[tid] += sdata[tid + s] ==> sdata[%u] += sdata[%u + %u] ==> %f += %f\n",
+            printf("\n\nThread ID: %u; Block index: %u; Block dimension: %u; \nif (tid < s): if (%u < %u); ==> sdata[tid] += sdata[tid + s] ==> sdata[%u] += sdata[%u + %u] ==> %f += %f\n",
             tid, blockIdx.x, blockDim.x, tid, s, tid, tid, s, sdata[tid], sdata[tid + s]);
             sdata[tid] += sdata[tid + s];  // Each active thread adds its partner’s value
         } else {
-            printf("\n\nThread ID: %u; Block index: %u; Block dimension: %u; \nif (tid < s): if (%u < %u);\n ==> DO NOTHING",
+            printf("\n\nThread ID: %u; Block index: %u; Block dimension: %u; \nif (tid < s): if (%u < %u); ==> DO NOTHING",
             tid, blockIdx.x, blockDim.x, tid, s);
             sdata[tid] += sdata[tid + s];  // Each active thread adds its partner’s value
         }
