@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "CUDA Tutorial simulators and examples",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/python/block_reduce_simulator.py",
+            "python": "${workspaceFolder}/vnvcuda/bin/python",
+            "args": [
+                // "-s", "data_files/input-files/hapoalim/",
+                // "-t", "data_files/target/hapoalim.csv"
+            ],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            },
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}
