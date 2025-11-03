@@ -7,7 +7,8 @@ __global__ void block_reduce(const float *a, float *partial, int n);
 float cpu_sum(const float *a, int n);
 
 int main() {
-    int N = 1 << 20;  // 1M elements (2^20)
+    // int N = 1 << 20;  // 1M elements (2^20)
+    int N = 16;
     size_t size = N * sizeof(float); 
     float *h_a = new float[N];  // Host (CPU) buffer
     for (int i = 0; i < N; ++i) h_a[i] = 1.0f;  // Initialize all values to 1.0
@@ -17,6 +18,7 @@ int main() {
     cudaMemcpy(d_a, h_a, size, cudaMemcpyHostToDevice);  // Copy host data to GPU
 
     int threads = 256;
+    int threads = 8;
     int blocks = (N + threads * 2 - 1) / (threads * 2);  
     // Number of blocks needed so each thread processes ~2 elements.
     // The "*2" allows each thread to load and sum two elements at once for better efficiency.
