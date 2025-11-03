@@ -1,6 +1,7 @@
 # Simple Makefile for tutorial04
 
-NVCC = /usr/local/cuda-12.2/bin/nvcc
+NVCC = nvcc
+# NVCC = /usr/local/cuda-12.2/bin/nvcc
 CXXFLAGS = -O2
 
 TARGET = vector_sum
