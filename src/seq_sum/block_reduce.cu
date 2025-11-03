@@ -1,3 +1,5 @@
+#include <cstdio>
+
 __global__ void block_reduce(const float *a, float *partial, int n) {
     // Shared memory buffer for this thread block (allocated dynamically at kernel launch)
     extern __shared__ float sdata[];
