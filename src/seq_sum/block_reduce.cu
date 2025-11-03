@@ -45,6 +45,7 @@ __global__ void block_reduce(const float *a, float *partial, int n) {
         if (tid < s)
             sdata[tid] += sdata[tid + s];  // Each active thread adds its partner’s value
         __syncthreads();                   // Wait until all updates are complete
+        printf("Threads synchronised. TID: %u", tid);
     }
 
     // After the loop, thread 0 holds the total sum for this block
