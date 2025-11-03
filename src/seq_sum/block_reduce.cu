@@ -1,3 +1,4 @@
+#include <iostream>
 __global__ void block_reduce(const float *a, float *partial, int n) {
     // Shared memory buffer for this thread block (allocated dynamically at kernel launch)
     extern __shared__ float sdata[];
@@ -38,6 +39,10 @@ __global__ void block_reduce(const float *a, float *partial, int n) {
     //  Step 2: thread0+=thread2, thread1+=thread3, ...
     //  Step 3: thread0+=thread1  → sdata[0] now holds block sum.
     for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
+        std::cout << "\n\nThread ID: " << tid << "; Block index: " << blockIdx.x << 
+        "; Block dimension: " << blockDim.x << "; \nif (tid < s): if (" << tid << " < " << s << ");\n" <<
+        "sdata[tid] += sdata[tid + s] ==> sdata[" << tid << "] += sdata[" << tid << " + " << s << "] ==> " <<
+        sdata[tid] << " + " << sdata[tid + s] << "\n";
         if (tid < s)
             sdata[tid] += sdata[tid + s];  // Each active thread adds its partner’s value
         __syncthreads();                   // Wait until all updates are complete
